@@ -1,14 +1,17 @@
-﻿//Kyle Kolodziej
-//Updated 12/8
+﻿/* Creator of file: Kyle Kolodziej
+ * Last updated: December 18th, 2019
+ *
+ * DESCRIPTION OF DOCPARSE:
+ *
+ *
+ */
 
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <algorithm>
-#include <regex>
 #include <string.h>
-//#include "myhtml/api.h"
 #include "docparse.h"
 #include "regex.h"
 #include "json.hpp"
@@ -17,17 +20,14 @@
 #include "avl.h"
 #include "example.h"
 using namespace std;
-//using json = nlohmann::json;
 
 DocParse::DocParse()
 {
-    size = 0;
-    addStopWords();
-    /*cout << "stop words are: " << endl;
-    for(int i = 0; i < stopWords.size(); i++)
-    {
-        cout << stopWords[i] << endl;
-    }*/
+    totalOpinions = 0;
+    totalWords = 0;
+    addStopWords(); //Populate stopWord vector
+    //Switch stop word vector to avl tree?
+
 }
 
 DocParse::~DocParse()
@@ -35,37 +35,23 @@ DocParse::~DocParse()
 
 }
 
-
-
-void DocParse::readDoc(char *argv[], int structureChoice, Index * p)
+void DocParse::readDoc(char *argv[], Index *& p)
 {
-   // cout << "in doc parse class" << endl;
     DIR * point;
     struct dirent *pointEnt;
-    //ifstream file;
-    if((point=opendir(argv[1]))!= NULL)
+    if((point=opendir(argv[1]))!= nullptr)
     {
-       // cout << "in loop 1" << endl;
-        while((pointEnt = readdir(point))!= NULL)
+        while((pointEnt = readdir(point))!= nullptr)
         {
-           // cout << "in loop 2" << endl;
-
             vector<string> data;
             string fPath = argv[1];
             string direct = fPath;
             string fileName = pointEnt->d_name;
             string getID;
             getID = fileName.substr(0, fileName.size() - 5); //subtract four for the .json added to file name
-            //char * convert;
-           //cout << "id is: " << getID << endl << endl;
-            //strcpy(convert, &getID[0]);
             docID = getID;
-            //cout << "file name: " << fileName << endl;
             string tempFile = fPath + "/" + fileName;
-           // string tempFile = "/home/student/Desktop/scotus-small/" + fileName;
-            //cout << "temp file is: " << tempFile << endl;
             ifstream file(tempFile);
-            //ifstream file("/home/student/Desktop/scotus-small/111319.json");
             if(fileName != + "." && fileName != "..")
             {
                 nlohmann::json jObj;
@@ -83,97 +69,110 @@ void DocParse::readDoc(char *argv[], int structureChoice, Index * p)
                 found = found + docID.size() + 1;
                 string caseName;
                 caseName = abUrl.substr(found);
-                //cout << "Case name is : " << caseName << endl;
                 formatTitle(caseName);
-                //cout << "Formatted is: " << title << endl;
+                string html;
 
+                /* Loops below used to determine where the html text is located
+                 * Tag options are:
+                 * "html"
+                 * "html_with_citations"
+                 * "html_lawbox"
+                 * "html_columbia"
+                 *
+                 * NOTE:
+                 * Also can have "Certiorari denied" or "Petition for rehearing denied"
+                 * Need to ignore these two cases
+                 * Will check size of html to see if either of these cases?
+                 * Will create two strings for these test cases and use std::find function
+                 * In order to determine whether the html text contains these test cases
+                 *
+                 */
 
-                string html = jObj["html"];
-                if(html.size() < 20)
+                string case1 = "Certiorari denied";
+                string case2 = "Petition for rehearing denied";
+                if(jObj["html"] == nullptr)
                 {
-                    //cout << "Type 1" << endl;
-                    html = jObj["html_lawbox"]; //If not on html tag need to look elsewhere
-
-                }
-
-                if(html.size() < 20)
-                {
-                    //cout << "Type 2" << endl;
-                    html = jObj["html_columbia"]; //If not on html tag need to look elsewhere
-
-                }
-
-                if(html.size() < 20)
-                {
-                    //cout << "Type 3" << endl;
-                    html = jObj["html_with_citations"]; //If not on html tag need to look elsewhere
-
-                }
-
-                if(html.size() < 20)
-                {
-                    throw "Error finding html text for file!";
-                }
-
-                if(html == "certiorari is denied")
-                {
-                    continue;
-                }
-
-                size++;
-//
-                //getDates(html);
-                int a = 0, b = 0;
-                //Using this to remove the html tags
-                //Referred to: https://stackoverflow.com/questions/49333136/removing-html-tags-from-a-string-of-text
-
-                for (int a = b; a < html.length(); a++)
-                {
-                    if (html[a] == '<')
+                    if(jObj["html_with_citations"] == nullptr)
                     {
-                        for (int b = a; b < html.length(); b++)
+                        if(jObj["html_lawbox"] == nullptr)
                         {
-                            if (html[b] == '>')
+                            if(jObj["html_columbia"] == nullptr)
                             {
-                                html.erase(a, (b - a + 1));
-                                break;
+                                //don't do anything, all are nullptr
+                            }
+                            else {
+                                html = jObj["html_columbia"];
                             }
                         }
-                    }                    
-                }
-                //stripUnicode(html);
+                        else {
+                            html = jObj["html_lawbox"];
+                        }
+                    }
+                    else {
+                        html = jObj["html_with_citations"];
+                    }
 
-
-                //string s = "søme string";
-                //html = Regex.Replace(html, @"[^\u0000-\u007F]+", string.Empty);
-               // Regex regex = new Regex(@"[^a-zA-Z0-9\s]", (RegexOptions)0);
-                    //return regex.Replace(html, "");
-                submissionDate = html;
-                char word[html.length() +1];
-                strcpy(word, &html[0]);
-                removeStopWords(word); //Adding all of the words that aren't stop words to the documentWords vect
-                if(structureChoice == 1)
-                {
-                    stemDocWordstoAVL(p);
                 }
                 else {
-                    stemDocWordstoHash(p);
+                    html = jObj["html"];
                 }
-                //stemDocWords();
-                //At this point need to send to index handler
-                //sendToIndex();
-               //delete [] word;
 
 
+               if((html.find(case1) != string::npos) || (html.find(case2) != string::npos))
+                {
+                    //cout << "found them" << endl << endl;
+                   //USE AS TESTER FOR FILES THAT WERE GIVING TROUBLE******
+                    break;
+                }
+                else {
+                    totalOpinions++; //Update size (Total number of opinions parsed)
 
+                    int a = 0, b = 0;
+                    /* Using the code below to
+                     * (1) Remove the html tags
+                     * (2) Remove any non ASCII characters
+                     * Referred to: https://stackoverflow.com/questions/49333136/removing-html-tags-from-a-string-of-text
+                     *
+                     *
+                     * The stripping the html tag part is the first if statement in for loop (<> checked)
+                     * Below it checks whether the character in the string is within range of ASCII characters
+                     * If not, then it will remove the character
+                     *
+                     * Attempted to use HTML parser (FILL IN) to strip the HTML tags
+                     * Attempted to use Regex to strip the non ASCII characters
+                     */
+
+                    for (int a = b; a < html.length(); a++)
+                    {
+                        if (html[a] == '<') //Removing the HTML tags
+                        {
+                            for (int b = a; b < html.length(); b++)
+                            {
+                                if (html[b] == '>')
+                                {
+                                    html.erase(a, (b - a + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        else if(html[a] < 26 || html[a] > 128) //Removing non ascii characters
+                        {
+                            html.erase(a, a+1);
+                        }
+
+                    }
+
+                    strippedHtml = html; //feel like should be using dynamic memory location with html so large
+                    char * word = new char[html.length() +1];
+                    strcpy(word, &html[0]);
+                    removeStopWords(word, p); //Adding all of the words that aren't stop words to the documentWords vect
+                    delete [] word;
+                }
             }
             file.close();
         }
-        //file.close();
-       closedir(point);
     }
-    //closedir(point);
-    //indexTree.print();
+    closedir(point);
 }
 
 void DocParse::getDates(string & arr)
@@ -213,8 +212,8 @@ void DocParse::sendToIndex()
         string temp;
         temp = stemmedDocWords[i];
         cout << "word is " << temp << endl;
-        IndexWord newObj(temp, docID, title, url);
-        indexTree.insert(newObj);
+        //IndexWord newObj(temp, docID, title, url);
+        //indexTree.insert(newObj);
         //then add these to an AVL tree?
         //IndexWord newObj(docID, temp);
 
@@ -231,11 +230,12 @@ void DocParse::upperToLower(string & inputString)
     transform(inputString.begin(), inputString.end(), inputString.begin(), ::tolower);
 }
 
-void DocParse::removeStopWords(char *arr)
+void DocParse::removeStopWords(char *arr, Index*&p)
 {
+    StemFunctionality stemObj;
     //Adding all of the words that aren't stop words to the documentWords vect
     char * temp;
-    temp = strtok(arr, ".-;:,?><='()[]& \n");
+    temp = strtok(arr, ".-;:,?><='*$%()_!~#@[]& \n  \t");
     while(temp!= nullptr)
     {
         if(temp == nullptr)
@@ -253,10 +253,15 @@ void DocParse::removeStopWords(char *arr)
             //do nothing if less than 3
         }
         else {
-            documentWords.push_back(temp2);
+            string preview = strippedHtml.substr(0,200);
+            stemObj.stemWord(temp2);
+            IndexWord newIndexObj(temp2, docID, title, url, preview);
+            p->insert(newIndexObj);
+            totalWords++;
+            //documentWords.push_back(temp2); //Document words has total number of words
             //If not a stop word, it will add to the docWords vect
         }
-        temp = strtok(nullptr, ".-;:,?><='()[]& \n");
+        temp = strtok(nullptr, ".-;:,?><='_~*$%#@!()[]& \n  \t");
     }
 }
 
@@ -270,7 +275,7 @@ void DocParse::stripUnicode(string & str)
     //str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
 }
 
-void DocParse::stemDocWordstoAVL(Index * p)
+void DocParse::stemDocWordstoAVL(Index *& p)
 {
     //This function will take the documentWords (html tags and stop words already removed)
     //And will stem each word before adding it into a vector of all the stemmedDocWords
@@ -281,8 +286,9 @@ void DocParse::stemDocWordstoAVL(Index * p)
     {
         temp = documentWords[i];
         stemObj.stemWord(temp);
-        IndexWord newIndexObj(temp, docID, title, url);
-        newIndexObj.addDocHTML(submissionDate, newIndexObj.getDocVect().size()-1);
+        string preview = strippedHtml.substr(0,200);
+        IndexWord newIndexObj(temp, docID, title, url, preview);
+        //newIndexObj.addDocHTML(submissionDate, newIndexObj.getDocVect().size()-1);
         p->insert(newIndexObj);
         stemmedDocWords.push_back(temp);
     }
@@ -304,17 +310,21 @@ void DocParse::stemDocWordstoHash(Index * p)
         //cout << "In loop " << endl;
         temp = documentWords[i];
         stemObj.stemWord(temp);
-        IndexWord newIndexObj(temp, docID, title, url);
+        string preview = strippedHtml.substr(0,200);
+        IndexWord newIndexObj(temp, docID, title, url, preview);
         p->insert(newIndexObj);
         stemmedDocWords.push_back(temp);
     }
-   // cout << "out of has function" << endl;
-   // p->print();
 }
 
-int DocParse::getSize()
+double DocParse::getTotalWordCount()
 {
-    return size;
+    return totalWords;
+}
+
+int DocParse::getTotalOpinionCount()
+{
+    return totalOpinions;
 }
 
 
@@ -380,6 +390,16 @@ void DocParse::formatTitle(string & caseName)
         temp = strtok(nullptr, "-/");
     }
     title = tempTitle;
+}
+
+void DocParse::printTotalWords(ostream & out)
+{
+    out << "Total Number of Words Indexed: " << totalWords << endl;
+}
+
+void DocParse::printTotalOpinions(ostream & out)
+{
+    out << "Total Number of Opinions Indexed: " << totalOpinions << endl;
 }
 
 AVL<IndexWord>& DocParse::getIndexTree() {

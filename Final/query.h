@@ -1,6 +1,10 @@
-//David Hoffman
-//last revision: 12/5/19
-//Kyle Kolodziej revising 12/8/19
+/* Creator of file: Kyle Kolodziej
+ * Last updated: December 18th, 2019
+ *
+ * DESCRIPTION OF QUERY:
+ *
+ *
+ */
 
 #ifndef QUERY_H
 #define QUERY_H
@@ -13,9 +17,15 @@ using namespace std;
 class Query {
 private:
     vector<string> userSearch;
+    vector<string> wordsPreStem;
     Index * queryIndex;
-    vector<int> docCount;
-    vector<int> sortedDocCount;
+    vector<string> idFirst;
+    vector<string> idSec;
+    vector<IndexWord> indexVect;
+    vector<IndexWord> finalIndexVect;
+    vector<Document> docVect;
+    vector<Document> finalDocVect;
+    vector<string> compareVect;
 public:
     Query(Index* input);
       //default constructor
@@ -29,13 +39,16 @@ public:
       //runs search with and boolean operator
     void orSearch();
       //runs search with boolean operator
-    void seperateWords(string&, size_t&);
-      //breaks up multi-word search and stores words in userSearch vector
     void getStats();
       //returns search statistics
-    void getResults(vector<string>&docID);
-    void sortCount(vector<string>&);
     void regSearch();
+    void clearVars();
+    void newSearch();
+    void notSearch();
+    void orNotSearch(int nIndex);
+    void andNotSearch(int nIndex);
+    void previewPrompt(IndexWord &);
+    IndexWord makeIndexWordObj(vector<Document> &docVect);
 };
 
 #endif // QUERY_H

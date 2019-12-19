@@ -25,7 +25,10 @@ public:
       //give print definition for hash
     bool contains(const IndexWord &x);
       //give contains definition for hash
-    IndexWord& find(IndexWord & x);
+    const IndexWord& find(const IndexWord & x);
+     void save(ostream&);
+      void setStats(int numOpinions, double numWords);
+      void getStats();
 };
 
 #endif // HASHINDEX_H

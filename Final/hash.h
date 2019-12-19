@@ -4,9 +4,9 @@
 #ifndef HASH_H
 #define HASH_H
 #include "avl.h"
+#include "indexword.h"
 #include<iostream>
 #include <string.h>
-#include <indexword.h>
 #include <cstddef>
 #include <list>
 

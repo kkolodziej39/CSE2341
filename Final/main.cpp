@@ -1,6 +1,9 @@
-//Kyle Kolodziej and David Hoffman
-//Updated 11/25
-//Testing edits and mapping out functionality in main by Kyle
+/* Owner and Creator: Kyle Kolodziej
+ * Date started: November 19th, 2019
+ * Date updated: December 18th, 2019
+ *
+ *
+ */
 #include <iostream>
 #include <algorithm>
 #include <cstring>
@@ -24,11 +27,18 @@
 #include"hash.h"
 
 using namespace std;
-//using json = nlohmann::json;
 
+/* COMMAND LINE PROMPT INSRUCTIONS:
+ * 1.) First input should contain the path to a folder of Json files
+ * 2.) Second input should contain the name of the Output File for the persistent index to be stored
+ * 3.) Include optional 3rd input of search terms?
+ *
+ */
 
 int main(int argc, char *argv[])
 {
+    User user(argv);
+    user.start(argv);
    /* int first[] = {5,10,15,20,25};
       int second[] = {50,40,30,20,10};
       std::vector<int> v(10);                      // 0  0  0  0  0  0  0  0  0  0
@@ -86,10 +96,6 @@ int main(int argc, char *argv[])
     obj.printIndexWord();*/
     //DocParse temp;
     //temp.readDoc(argv);
-
-
-    User user(argv);
-    user.start(argv);
 
     //Print total number of nodes (unique words)
     //avlTree.getNumOfNodes() ? funct

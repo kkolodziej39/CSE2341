@@ -11,7 +11,7 @@ class Document
 public:
     Document();
     ~Document();
-    Document(string & i, string & t, string &u); //Constructing with the id as a param
+    Document(string & i, string & t, string &u, string & p); //Constructing with the id as a param
     string& getDocID();
     int getDocCount();
     void increaseCount();
@@ -21,13 +21,16 @@ public:
     Document& operator=(const Document &input);
     void addHTML(string &);
     void printHTML();
+    string & getPreview();
+    void printPreview();
+    void printQueryDoc();
 
 private:
     int count;
     string documentID;
     string title;
     string url;
-    string htmlText;
+    string preview;
     //any other info from doc?
 };
 

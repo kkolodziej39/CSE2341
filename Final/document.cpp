@@ -13,12 +13,13 @@ Document::~Document()
 
 }
 
-Document::Document(string & i, string & t, string&u)
+Document::Document(string & i, string & t, string&u, string & p)
 {
     count = 1;
     title = t;
     documentID = i;
     url =u;
+    preview = p;
 }
 
 Document& Document::operator=(const Document &input)
@@ -27,7 +28,7 @@ Document& Document::operator=(const Document &input)
     documentID = input.documentID;
     title = input.title;
     url = input.url;
-    htmlText = input.htmlText;
+    preview = input.preview;
     return *this;
 }
 
@@ -59,19 +60,40 @@ string& Document::getTitle()
 void Document::printDocument()
 {
     //cout << "Document ID is: " << documentID << endl << ", Count is: " << count << ", Document title is: " << title << ", URL is: " << url << endl << endl;
-    cout << "Document ID is: " << getDocID() << endl;
+    //cout << "Document ID is: " << getDocID() << endl;
     cout << "Count is: " << count << endl;
     //cout << "Count is (2): " << getDocCount() << endl;
     cout << "Document title is: " << title << endl;
     cout << "Link to Document: " << url << endl;
-    cout << "Preview..." << endl;
+   // cout << "Preview:" << endl;
     //cout << htmlText;
-    string temp = htmlText.substr(0, 200);
-    cout << "'" << temp << "'" << endl << endl;
+   // string temp = htmlText.substr(0, 200);
+    //cout << preview  << endl << endl;
 
+}
+
+void Document::printQueryDoc()
+{
+    cout << "Document title is: " << title << endl;
+    cout << "Link to Document: " << url << endl;
+    //cout << "Preview:" << endl;
+    //cout << htmlText;
+   // string temp = htmlText.substr(0, 200);
+    //cout << preview  << endl << endl;
+}
+
+string & Document::getPreview()
+{
+    return preview;
 }
 
 void Document::addHTML(string & x)
 {
-    htmlText =x;
+    preview =x;
+}
+
+void Document::printPreview()
+{
+    cout << "Preview: " << endl << endl;
+    cout << preview << endl << endl;
 }

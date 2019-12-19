@@ -33,9 +33,32 @@ bool HashIndex::contains(const IndexWord &x) {
    // return hashTable.contains(x);
 }
 
-IndexWord& HashIndex::find(IndexWord &x)
+const IndexWord &HashIndex::find(const IndexWord &x)
 {
     //return hashTable.find
 }
+
+void HashIndex::save(ostream & out)
+{
+    //avlTree.save(out);
+}
+
+void HashIndex::getStats()
+{
+    /*double avgWordOpinion = wordCount/opinionCount;
+    cout << "Total number of unique words indexed: " << avlTree.getNumElements() << endl;
+    cout << "Number of opinions indexed: " << avlTree.getNumOpinions() << endl;
+    cout << "Average number of words indexed per opinion: ";
+    printf("%.2f\n", avgWordOpinion);
+    //cout << "Top 50 most frequent words: " << endl;*/
+}
+
+void HashIndex::setStats(int numOpinions, double numWords)
+{
+    //opinionCount = numOpinions;
+    //wordCount = numWords;
+}
+
+
 
 //class provides hash definitions for abstract index classes

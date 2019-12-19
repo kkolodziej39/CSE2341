@@ -23,26 +23,30 @@ class DocParse
 public:
     DocParse();
     ~DocParse();
-    void readDoc(char *argv[], int choice, Index * );
+    void readDoc(char *argv[], Index *& );
     void parseHTML(char * html);
     void printWords();
     void addStopWords();
-    void removeStopWords(char * arr);
-    void stemDocWordstoAVL(Index * );
+    void removeStopWords(char * arr, Index*&);
+    void stemDocWordstoAVL(Index * &);
     void stemDocWordstoHash(Index * );
     void upperToLower(string & );
     void sendToIndex();
     void formatTitle(string &);
     void getDates(string & arr);
     AVL<IndexWord>& getIndexTree();
-    int getSize();
+    double getTotalWordCount();
+    int getTotalOpinionCount();
     bool invalidChar(char c);
     void stripUnicode(string & str);
+    void printTotalOpinions(ostream&);
+    void printTotalWords(ostream&);
       //returns indexTree
 
     vector<string> stemmedDocWords;
 private:
-    int size;
+    int totalOpinions;
+    double totalWords;
     //AVL<string> stopWords;
     //AVL<string> indexTree;
     //AvlTree<string> stopWords;
@@ -54,7 +58,7 @@ private:
     AVL<IndexWord> indexTree;
     string title;
     string url;
-    string submissionDate;
+    string strippedHtml;
     string decisionDate;
 };
 

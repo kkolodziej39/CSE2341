@@ -12,6 +12,8 @@ using namespace std;
 class AVLIndex: public Index {
 private:
     AVL<IndexWord> avlTree;
+    int opinionCount;
+    double wordCount;
 
 public:
     AVLIndex();
@@ -23,10 +25,13 @@ public:
     void print();
       //give print definition for avl
     bool contains(const IndexWord &x);
-    IndexWord& find(IndexWord & x);
+    const IndexWord& find(const IndexWord & x);
       //give contains definition for avl
     //bool contains(const string & x);
-    AVL<IndexWord>& returnAVLTree();
+    void save(ostream&);
+    void getStats();
+    void setStats(int numOpinions, double numWords);
+    AVL<IndexWord> returnAVLTree();
 };
 
 #endif // AVLINDEX_H

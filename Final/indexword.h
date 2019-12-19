@@ -16,8 +16,9 @@ class IndexWord
 public:
     IndexWord();
     IndexWord(string & t);
+    IndexWord(Document & documentObj);
     void addDocHTML(string &, int);
-    IndexWord(string & a, string & b, string &t, string &u); //a is the word and b is the doc id
+    IndexWord(string & a, string & b, string &t, string &u, string &p); //a is the word and b is the doc id
     ~IndexWord();
     void setIndexWord(string&);
       //sets word object
@@ -39,12 +40,18 @@ public:
     void printIndexWord();
     friend std::ostream& operator << (std::ostream&, IndexWord&);
     void sortByCount();
+    void printTopThree();
+    void sortByDocID();
+    int getIndexWordSize();
+    void getDocPreviewAt(int index);
+    int getTotalFreq();
 
 
 
 private:
     string word;
     vector<Document> docVect;
+    int totalFreq;
 };
 
 #endif // INDEXWORD_H
